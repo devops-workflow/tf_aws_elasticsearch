@@ -1,11 +1,30 @@
-variable "domain_name" {
-  description = "Domain name for Elasticsearch cluster (will be prefixed with 'tf-')"
-  default     = "es-domain"
+// Standard Variables
+
+variable "name" {
+  description = "Name for the Elasticsearch cluster"
+}
+variable "environment" {
+  description = "Environment (ex: dev, qa, stage, prod)"
+}
+variable "namespaced" {
+  description = "Namespace all resources (prefixed with the environment)?"
+  default     = true
+}
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  default     = {}
 }
 
+// Module specific Variables
+
+#variable "domain_name" { -> name
+#  description = "Domain name for Elasticsearch cluster (will be prefixed with 'tf-')"
+#  default     = "es-domain"
+#}
+
 variable "es_version" {
-  description = "Version of Elasticsearch to deploy (default 5.1)"
-  default     = "5.1"
+  description = "Version of Elasticsearch to deploy (default 5.5)"
+  default     = "5.5"
 }
 
 variable "instance_type" {
@@ -55,5 +74,4 @@ variable "snapshot_start_hour" {
   default     = 0
 }
 
-# vim: set et fenc=utf-8 ff=unix ft=terraform sts=2 sw=2 ts=2 : 
-
+# vim: set et fenc=utf-8 ff=unix ft=terraform sts=2 sw=2 ts=2 :

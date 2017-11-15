@@ -25,8 +25,8 @@ data "aws_iam_policy_document" "es_management_access" {
   }
 }
 
-resource "aws_elasticsearch_domain" "es" {
-  domain_name           = "tf-${var.domain_name}"
+resource "aws_elasticsearch_domain" "this" {
+  domain_name = "${var.namespaced ? format("%s-%s", var.environment, var.name) : format("%s", var.name)}"
   elasticsearch_version = "${var.es_version}"
 
   cluster_config {
@@ -49,15 +49,18 @@ resource "aws_elasticsearch_domain" "es" {
   snapshot_options {
     automated_snapshot_start_hour = "${var.snapshot_start_hour}"
   }
-  tags {
-    Domain = "${var.domain_name}"
-  }
+  tags = "${ merge(
+    var.tags,
+    map("Name", var.namespaced ?
+     format("%s-%s", var.environment, var.name) :
+     format("%s", var.name) ),
+    map("Environment", var.environment),
+    map("Terraform", "true") )}"
 }
 
 resource "aws_elasticsearch_domain_policy" "es_management_access" {
-  domain_name     = "tf-${var.domain_name}"
+  domain_name     = "${aws_elasticsearch_domain.this.domain_name}"
   access_policies = "${data.aws_iam_policy_document.es_management_access.json}"
 }
 
-# vim: set et fenc= ff=unix ft=terraform sts=2 sw=2 ts=2 : 
-
+# vim: set et fenc= ff=unix ft=terraform sts=2 sw=2 ts=2 :
